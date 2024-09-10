@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dev music-player</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/6.4.8/swiper-bundle.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600&display=swap");
+
+      :root {
+        --primary-clr: rgba(228, 228, 229, 1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Nunito", sans-serif;
+      }
+
+      body {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        width: 100%;
+        background: url("assets/Images/Photo.jpeg");
+        background-repeat: no-repeat;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        animation: slidein 120s forwards infinite alternate;
+      }
+
+      @keyframes slidein {
+        0%,
+        100% {
+          background-position: 20% 0%;
+          background-size: 3400px;
+        }
+        50% {
+          background-position: 100% 0%;
+          background-size: 2400px;
+        }
+      }
+
+      .album-cover {
+        width: 90%;
+      }
+
+      .swiper {
+        width: 100%;
+        padding: 40px 0 100px;
+      }
+
+      .swiper-slide {
+        position: relative;
+        max-width: 300px;
+        aspect-ratio: 1/1;
+        border-radius: 10px;
+      }
+
+      .swiper-slide img {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+        border-radius: inherit;
+        -webkit-box-reflect: below -5px linear-gradient(transparent, transparent, rgba(232, 226, 226, 0.4));
+        transform-origin: center;
+        transform: perspective(800px);
+        transition: 0.3s ease-out;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .swiper-slide-active .overlay {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 98%;
+        background-color: rgba(232, 231, 234, 0.6);
+        border-radius: inherit;
+        opacity: 0;
+        transition: all 0.4s linear;
+      }
+
+      .swiper-slide:hover .overlay {
+        opacity: 1;
+      }
+
+      .swiper-slide .overlay ion-icon {
+        opacity: 0;
+      }
+
+      .swiper-slide-active:hover .overlay ion-icon {
+        font-size: 4rem;
+        color: #eb0b0b;
+        opacity: 1;
+        cursor: pointer;
+      }
+
+      .music-player {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: rgb(232, 227, 227);
+        width: 380px;
+        padding: 10px 30px;
+        border-radius: 20px;
+      }
+
+      .music-player h1 {
+        font-size: 2.5rem;
+        font-weight: 600;
+        line-height: 1.6;
+      }
+
+      .music-player p {
+        font-size: 1.5rem;
+        font-weight: 400;
+        opacity: 0.6;
+      }
+
+      #progress {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 100%;
+        height: 7px;
+        background: rgba(245, 244, 246, 0.4);
+        border-radius: 4px;
+        margin: 32px 0 24px;
+        cursor: pointer;
+      }
+
+      #progress::-webkit-slider-thumb {
+        appearance: none;
+        -webkit-appearance: none;
+        background: rgba(163, 162, 164, 0.9);
+        width: 16px;
+        aspect-ratio: 1/1;
+        border-radius: 50%;
+        outline: 4px solid var(--primary-clr);
+        box-shadow: 0 6px 10px rgba(5, 36, 28, 0.3);
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .controls button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        aspect-ratio: 1/1;
+        margin: 20px;
+        background: rgba(6, 6, 6, 0.3);
+        color: rgb(252, 248, 248);
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        outline: 0;
+        font-size: 1.1rem;
+        box-shadow: 0 10px 20px rgba(5, 36, 28, 0.3);
+        cursor: pointer;
+        transition: all 0.3s linear;
+      }
+
+      .controls button:is(:hover, :focus-visible) {
+        transform: scale(0.96);
+      }
+
+      .controls button:nth-child(2) {
+        transform: scale(1.3);
+      }
+
+      .controls button:nth-child(2):is(:hover, :focus-visible) {
+        transform: scale(1.25);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="album-cover">
+      <div class="swiper">
+        <div class="swiper-wrapper"></div>
+      </div>
+    </div>
+
+    <div class="music-player">
+      <h1 id="song-title">Title</h1>
+      <p id="singer-name">Singer</p>
+
+      <audio id="song">
+        <source src="" type="audio/mpeg" />
+      </audio>
+
+      <input type="range" value="0" id="progress" />
+
+      <div class="controls">
+        <button class="backward">
+          <i class="fa-solid fa-backward"></i>
+        </button>
+        <button class="playPause">
+          <i class="fa-solid fa-play"></i>
+        </button>
+        <button class="forward">
+          <i class="fa-solid fa-forward"></i>
+        </button>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/6.4.8/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ionicons/5.5.2/ionicons.min.js"></script>
+    <script>
+      const songs = [
+        {
+          title: "Hey!",
+          singer: "It's always a too good vibe to talk to you.",
+          src: "assets/Music/Badshah - Paagal.mp3",
+          img: "assets/Images/3.jpg",
+        },
+        {
+          title: "Ritz",
+          singer: "It’s wonderful to see you both together. Kucchi Pucchi",
+          src: "assets/Music/Tum Hi Ho Bandhu.mp3",
+          img: "assets/Images/1.jpg",
+        },
+        {
+          title: "Velli",
+          singer: "Ka Bday hai, sudhar ja sudhar",
+          src: "assets/Music/Vele.mp3",
+          img: "assets/Images/7.jpg",
+        },
+        {
+          title: "Time flies,",
+          singer: "but true friend stay.",
+          src: "assets/Music/Ritviz - Udd Gaye [Official Audio].mp3",
+          img: "assets/Images/6.jpg",
+        },
+        {
+          title: "Bemisaal",
+          singer: "Powerpuff girls",
+          src: "assets/Music/Suno Aisha Best Song.mp3",
+          img: "assets/Images/10.jpg",
+        },
+        {
+          title: "Bhabi ji",
+          singer: "Sahi pakde hain?",
+          src: "assets/Music/Voh Dekhnay Mein.mp3",
+          img: "assets/Images/2.jpg",
+        },
+        {
+          title: "Rituja",
+          singer: "That's True though, that no one's better than you",
+          src: "assets/Music/Chatte Batte.mp3",
+          img: "assets/Images/11.jpg",
+        },
+        {
+          title: "Hmmm",
+          singer: "",
+          src: "assets/Music/Slow Motion Angreza Full Video.mp3",
+          img: "assets/Images/4.jpg",
+        },
+        {
+          title: "YO Hero!",
+          singer: "I'll just agree on this one",
+          src: "assets/Music/I Be There For You (Friends Theme Song).mp3",
+          img: "assets/Images/12.jpg",
+        },
+      ];
+
+      const swiperWrapper = document.querySelector(".swiper-wrapper");
+
+      songs.forEach((song, index) => {
+        const slide = document.createElement("div");
+        slide.classList.add("swiper-slide");
+        slide.innerHTML = `
+          <img src="${song.img}" />
+          <!-- <div class="overlay>
+              <a href="#" target="_blank" data-index="${index}">
+                  <ion-icon name=""></ion-icon>
+              </a>
+          </div> -->
+      `;
+        swiperWrapper.appendChild(slide);
+      });
+
+      const swiper = new Swiper(".swiper", {
+        effect: "coverflow",
+        loop: true,
+        slidesPerView: "auto",
+        centeredSlides: true,
+        coverflowEffect: {
+          rotate: 0,
+          stretch: 0,
+          depth: 100,
+          modifier: 2,
+          slideShadows: true,
+        },
+        navigation: {
+          nextEl: ".forward",
+          prevEl: ".backward",
+        },
+      });
+
+      const songElement = document.getElementById("song");
+      const progress = document.getElementById("progress");
+      const playPause = document.querySelector(".playPause");
+      const forward = document.querySelector(".forward");
+      const backward = document.querySelector(".backward");
+      const songTitle = document.getElementById("song-title");
+      const singerName = document.getElementById("singer-name");
+
+      let currentSongIndex = 0;
+
+      function loadSong(index) {
+        const song = songs[index];
+        songTitle.textContent = song.title;
+        singerName.textContent = song.singer;
+        songElement.src = song.src;
+      }
+
+      playPause.addEventListener("click", () => {
+        if (songElement.paused) {
+          songElement.play();
+          playPause.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+        } else {
+          songElement.pause();
+          playPause.innerHTML = `<i class="fa-solid fa-play"></i>`;
+        }
+      });
+
+      songElement.addEventListener("timeupdate", (e) => {
+        const { currentTime, duration } = e.srcElement;
+        const percent = (currentTime / duration) * 100;
+        progress.value = percent;
+      });
+
+      progress.addEventListener("change", (e) => {
+        const { value } = e.target;
+        const percent = (value / 100) * songElement.duration;
+        songElement.currentTime = percent;
+      });
+
+      forward.addEventListener("click", () => {
+        swiper.slideNext();
+        setTimeout(() => {
+          currentSongIndex = swiper.activeIndex % songs.length;
+          loadSong(currentSongIndex);
+          songElement.play();
+          playPause.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+        }, 200);
+      });
+
+      backward.addEventListener("click", () => {
+        swiper.slidePrev();
+        setTimeout(() => {
+          currentSongIndex = swiper.activeIndex % songs.length;
+          loadSong(currentSongIndex);
+          songElement.play();
+          playPause.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+        }, 200);
+      });
+
+      document.querySelectorAll(".overlay a").forEach((anchor) => {
+        anchor.addEventListener("click", function (event) {
+          event.preventDefault();
+          currentSongIndex = parseInt(this.getAttribute("data-index"));
+          loadSong(currentSongIndex);
+          songElement.play();
+          playPause.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+        });
+      });
+
+      loadSong(currentSongIndex);
+    </script>
+  </body>
+</html>
